@@ -1,0 +1,51 @@
+
+# Project Integration and Documentation
+
+## Integration overview
+
+The application combines UDP host telemetry, SDN switch-flow statistics and
+the monitoring detector. The integration helper in `integration/pipeline.py`
+provides two entry points:
+
+- `handle_telemetry(...)` for messages decoded by the central UDP server.
+- `handle_flow_stats(...)` for cumulative counters collected from the SDN
+  switch through the controller/statistics component.
+
+Both methods forward the original agreed field names to the existing
+`NetworkDetector`. An optional alert callback can forward detector alerts to
+the application's chosen output.
+
+## Repository structure
+
+    integration/
+        __init__.py
+        pipeline.py
+    monitoring/
+        detector.py
+    docs/
+        INTEGRATION_GUIDE.md
+        TESTING_GUIDE.md
+        DEMO_GUIDE.md
+
+The structure above is illustrative. Preserve any additional files already
+present in the shared repository.
+
+## Setup and execution
+
+Follow the project's main README and the team's confirmed Ubuntu/Mininet and
+controller setup instructions. The integration helper assumes the existing
+`monitoring` package is importable from the project root.
+
+## Verification status
+
+The integration code and documentation are prepared from the project context
+brief. They have not been executed against the current private GitHub
+repository or the other members' implementations. Confirm callback wiring,
+detector return types and controller interfaces before merging.
+
+## Assignment alignment
+
+This contribution supports socket–SDN integration, reproducible documentation,
+testing coordination and final demonstration preparation. Dynamic SDN behavior,
+Mininet deployment and end-to-end performance measurements must be implemented
+and verified with the responsible team members.
