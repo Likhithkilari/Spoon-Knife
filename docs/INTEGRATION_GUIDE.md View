@@ -1,0 +1,90 @@
+
+# Integration Guide — Member 4
+
+## Purpose
+
+This guide describes how the Network Monitoring and Alert System components are
+connected. The integration helper is `integration/pipeline.py`, which forwards
+incoming data to the existing `monitoring.detector.NetworkDetector`.
+
+## Component responsibilities
+
+- **Member 1:** Mininet topology, Open vSwitch, SDN controller and actual switch
+  flow-counter collection.
+- **Member 2:** UDP telemetry agents and central UDP monitoring server.
+- **Member 3:** `monitoring/detector.py` and its traffic-rate/alert logic.
+- **Member 4:** interfaces, integration workflow, documentation and end-to-end
+  test coordination.
+
+## Data flow
+
+1. Host telemetry agents send UDP messages to the central monitoring server.
+2. The UDP server decodes and validates a message.
+3. The server passes the telemetry dictionary to
+   `MonitoringPipeline.handle_telemetry(...)`.
+4. The SDN statistics collector obtains cumulative counters from the controlled
+   switch and passes each sample to `MonitoringPipeline.handle_flow_stats(...)`.
+5. The pipeline forwards each sample to `NetworkDetector`.
+6. Returned alerts can be sent to a display, log, or other alert handler through
+   the optional `on_alert` callback.
+7. Member 1's controller-side implementation is responsible for any dynamic
+   SDN action required by the assignment rubric.
+
+## Agreed data contracts
+
+SDN flow statistics:
+
+    {
+        "switch": "s1",
+        "flow_id": "h1-to-h2",
+        "byte_count": 400000,
+        "packet_count": 600,
+        "timestamp": 102.0
+    }
+
+Host telemetry:
+
+    {
+        "host": "h1",
+        "timestamp": 1792842000.0,
+        "bytes_sent": 9600,
+        "packets_sent": 120
+    }
+
+These are the field names specified in the project context brief. Confirm that
+the actual Member 1 and Member 2 implementations emit these fields before
+connecting the modules. Do not treat host-reported counters as switch counters.
+
+## Integration points
+
+The UDP server should call:
+
+    pipeline.handle_telemetry(decoded_message)
+
+The SDN flow-statistics collector should call:
+
+    pipeline.handle_flow_stats(flow_sample)
+
+Create the pipeline once and share that instance with the components:
+
+    from integration import MonitoringPipeline
+
+    def display_alert(alert):
+        print(alert)
+
+    pipeline = MonitoringPipeline(on_alert=display_alert)
+
+The snippet shows the intended interface; it is not a claim that the full
+server/controller application has already been connected or tested.
+
+## Important boundaries
+
+- Keep UDP as the assigned communication protocol.
+- Preserve `NetworkDetector`, `process_flow_stats`,
+  `process_telemetry`, and `find_stale_flows`.
+- The first cumulative flow-counter sample establishes a baseline; subsequent
+  samples are needed to calculate rates.
+- Dynamic SDN behavior is not implemented by this pipeline. It must be
+  coordinated with Member 1 and demonstrated separately.
+- Confirm the actual detector return type and the server/controller callback
+  interfaces against the latest repository source before merging.
