@@ -1,0 +1,42 @@
+
+# Demonstration Guide — Question 6
+
+## Demo objective
+
+Demonstrate that host telemetry is transported using UDP, actual SDN switch
+flow statistics are collected, the monitoring detector calculates traffic
+rates, configured thresholds produce alerts, and the SDN controller performs
+the required dynamic behavior.
+
+## Suggested demonstration sequence
+
+1. Explain the topology and identify the Mininet hosts and Open vSwitch.
+2. Show that the SDN controller is connected to the switch.
+3. Start the UDP telemetry agents and central UDP monitoring server.
+4. Show telemetry arriving at the server from multiple hosts.
+5. Generate traffic between selected Mininet hosts.
+6. Show actual switch flow-counter samples being collected.
+7. Explain that the first counter sample is a baseline and later samples allow
+   rate calculation.
+8. Demonstrate a normal-traffic case.
+9. Demonstrate a configured abnormal-traffic case and show the detector alert.
+10. Demonstrate the controller's dynamic SDN response. An alert printout alone
+    is not evidence of dynamic SDN functionality.
+11. Present measured performance results and compare the selected baseline
+    with the monitored/SDN-controlled case.
+12. Show the repository, test cases and setup documentation.
+
+## Evidence checklist
+
+- [ ] Mininet topology starts.
+- [ ] Controller-to-switch connection is visible.
+- [ ] Multiple hosts communicate.
+- [ ] UDP telemetry reaches the central server.
+- [ ] Actual switch flow counters are displayed or logged.
+- [ ] Traffic rates are calculated from successive samples.
+- [ ] Threshold alert is demonstrated.
+- [ ] Dynamic SDN behavior is demonstrated.
+- [ ] Performance measurements and comparison are shown.
+- [ ] Reproducible setup and test instructions are in GitHub.
+
+Only check an item after the team has actually demonstrated it.
